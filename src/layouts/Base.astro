@@ -1,0 +1,52 @@
+---
+import '@fontsource/bungee';
+import '@fontsource/rubik/400.css';
+import '@fontsource/rubik/700.css';
+
+interface Props {
+  title?: string;
+}
+const { title = 'Walker Rosenberg' } = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="description" content="Walker Rosenberg's website." />
+    <title>{title}</title>
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    --bg: #060912;
+    --panel: #0c1325;
+    --panel2: #111b33;
+    --grid: #0f1a30;
+    --line: #1d2d4d;
+    --teal: #19e6d0;
+    --teal-d: #0e8f86;
+    --coral: #ff6f61;
+    --coral-d: #b2453b;
+    --ink: #e9fbf8;
+    --muted: #8fa6bd;
+    --font-d: 'Bungee', system-ui, sans-serif;
+    --font-b: 'Rubik', system-ui, sans-serif;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background-color: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-b);
+    line-height: 1.5;
+    overflow: hidden;
+  }
+  h1, h2 { font-family: var(--font-d); font-weight: 400; margin: 0; text-wrap: balance; }
+  :focus-visible { outline: 3px solid var(--coral); outline-offset: 3px; }
+</style>

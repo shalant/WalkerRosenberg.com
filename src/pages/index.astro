@@ -1,20 +1,247 @@
 ---
-// Placeholder until Walker picks a layout from the artifact.
+import Base from '../layouts/Base.astro';
+
+// Placeholder text only. Nothing here is a confirmed fact about Walker:
+// he fills in real favorites after seeing the first build.
+const topics = [
+  { id: 'geometry-dash', name: 'Geometry Dash', color: 'teal', dy: -30, line: 'Favorite level: ???', line2: 'Best attempt: ???' },
+  { id: 'soccer', name: 'Soccer', color: 'plain', dy: 40, line: 'Favorite team: ???', line2: 'Favorite player: ???' },
+  { id: 'basketball', name: 'Basketball', color: 'coral', dy: -20, line: 'Favorite team: ???', line2: 'Favorite player: ???' },
+  { id: 'bears', name: 'Chicago Bears', color: 'plain', dy: 30, line: 'Favorite player: ???', line2: 'Best game ever: ???' },
+  { id: 'food', name: 'Food', color: 'teal', dy: -30, line: 'Favorite meal: ???', line2: 'Never eating again: ???' },
+];
 ---
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Walker Rosenberg</title>
-    <style>
-      body { margin: 0; min-height: 100vh; display: grid; place-items: center;
-             background: #0b0f1a; color: #19d3c5; font-family: system-ui, sans-serif; }
-      h1 { font-size: clamp(2rem, 8vw, 4rem); margin: 0; }
-      span { color: #ff7a6b; }
-    </style>
-  </head>
-  <body>
-    <h1>Walker <span>Rosenberg</span></h1>
-  </body>
-</html>
+<Base title="Walker Rosenberg">
+  <div class="stage">
+    <header class="hud">
+      <a class="logo" href="#start">Walker</a>
+      <nav aria-label="Topics">
+        {topics.map((t) => <a href={`#${t.id}`}>{t.name}</a>)}
+      </nav>
+      <div class="prog" aria-hidden="true"><div class="prog-fill" id="prog"></div></div>
+    </header>
+
+    <main class="level" id="level" tabindex="0" aria-label="Walker's level. Scroll sideways to run.">
+      <div class="track" id="track">
+        <section class="panel intro" id="start">
+          <h1>Walker <span>Rosenberg</span></h1>
+          <p>Scroll to run. Tap a name at the top to jump ahead.</p>
+          <p class="hint">Scroll &rarr;</p>
+        </section>
+
+        {topics.map((t) => (
+          <>
+            <div class="spike-gap" data-spike aria-hidden="true">
+              <i></i><i></i>
+            </div>
+            <section class={`panel ${t.color}`} id={t.id} style={`--dy:${t.dy}px`}>
+              <h2>{t.name}</h2>
+              <p>{t.line}</p>
+              <p>{t.line2}</p>
+              <p class="todo">Walker fills this in.</p>
+            </section>
+          </>
+        ))}
+
+        <div class="spike-gap" data-spike aria-hidden="true"><i></i><i></i><i></i></div>
+        <section class="panel finish" id="finish">
+          <h2>Level complete!</h2>
+          <p>More coming soon.</p>
+        </section>
+
+        <div class="ground" aria-hidden="true"></div>
+      </div>
+    </main>
+
+    <div class="cube" id="cube" aria-hidden="true"><span></span></div>
+  </div>
+</Base>
+
+<style>
+  .stage {
+    --ground: 96px;
+    position: relative;
+    height: 100%;
+    height: 100svh;
+    background-image:
+      radial-gradient(900px 420px at 80% -10%, rgba(25, 230, 208, 0.16), transparent 70%),
+      radial-gradient(700px 400px at 0% 40%, rgba(255, 111, 97, 0.1), transparent 70%),
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: auto, auto, 44px 44px, 44px 44px;
+  }
+
+  /* top bar */
+  .hud {
+    position: absolute;
+    inset: 0 0 auto 0;
+    z-index: 5;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 18px;
+    padding: max(10px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) 14px max(16px, env(safe-area-inset-left, 0px));
+    background: linear-gradient(#060912 60%, transparent);
+  }
+  .logo { font-family: var(--font-d); color: var(--teal); text-decoration: none; font-size: 1.2rem; }
+  .hud nav { display: flex; flex-wrap: wrap; gap: 4px 14px; }
+  .hud nav a {
+    color: var(--muted);
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .hud nav a:hover { color: var(--coral); }
+  .prog { flex: 1 1 100%; height: 5px; background: var(--line); }
+  .prog-fill { height: 100%; width: 0; background: var(--teal); }
+
+  /* scrolling level */
+  .level {
+    height: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+  .level::-webkit-scrollbar { display: none; }
+  @media (prefers-reduced-motion: no-preference) {
+    .level { scroll-behavior: smooth; }
+  }
+  .track {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: clamp(20px, 6vw, 80px);
+    height: 100%;
+    width: max-content;
+    min-width: 100%;
+    padding: 90px max(40vw, 200px) calc(var(--ground) + 20px) 28vw;
+  }
+
+  .ground {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: var(--ground);
+    background: linear-gradient(#0e1b36, #070c19);
+    border-top: 3px solid var(--teal);
+  }
+
+  .spike-gap {
+    align-self: flex-end;
+    margin-bottom: calc(var(--ground) - 20px);
+    display: flex;
+    gap: 2px;
+    flex: none;
+  }
+  .spike-gap i {
+    display: block;
+    width: 38px;
+    height: 44px;
+    background: var(--coral);
+    clip-path: polygon(50% 0, 100% 100%, 0 100%);
+  }
+
+  /* panels */
+  .panel {
+    flex: none;
+    width: min(78vw, 460px);
+    padding: 22px 24px 26px;
+    background: var(--panel2);
+    border: 2px solid var(--line);
+    clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 22px 100%, 0 calc(100% - 22px));
+    transform: translateY(var(--dy, 0px));
+  }
+  .panel h2 { font-size: clamp(1.5rem, 5vw, 2.2rem); color: var(--ink); margin-bottom: 10px; }
+  .panel p { margin: 4px 0; color: var(--muted); }
+  .panel .todo { margin-top: 14px; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--coral); }
+  .panel.teal { background: linear-gradient(160deg, #0f6e68, #0a3d44); border-color: var(--teal-d); }
+  .panel.coral { background: linear-gradient(160deg, #a8443b, #5e2230); border-color: var(--coral-d); }
+  .panel.teal p, .panel.coral p { color: #e9fbf8; }
+  .panel.teal .todo, .panel.coral .todo { color: #ffd9d4; }
+  .panel.coral .todo { color: #ffe9e6; }
+
+  .intro { background: transparent; border: 0; clip-path: none; padding-left: 0; width: min(80vw, 560px); transform: none; }
+  .intro h1 { font-size: clamp(2.6rem, 9vw, 5rem); line-height: 1; }
+  .intro h1 span { display: block; color: var(--teal); }
+  .intro p { font-size: 1.05rem; margin-top: 14px; max-width: 34ch; }
+  .intro .hint { color: var(--coral); font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+
+  .finish { border-color: var(--coral-d); }
+  .finish h2 { color: var(--coral); }
+
+  /* player */
+  .cube {
+    position: absolute;
+    z-index: 4;
+    left: clamp(24px, 14vw, 180px);
+    bottom: var(--ground);
+    width: 44px;
+    height: 44px;
+    background: var(--teal);
+    border: 3px solid #eafffb;
+    box-shadow: 0 0 22px rgba(25, 230, 208, 0.55);
+    display: grid;
+    place-items: center;
+    will-change: transform;
+  }
+  .cube span {
+    width: 18px;
+    height: 6px;
+    background: #06222a;
+    box-shadow: 0 -10px 0 -1px transparent;
+  }
+
+  @media (max-width: 560px) {
+    .cube { width: 34px; height: 34px; }
+    .spike-gap i { width: 30px; height: 36px; }
+  }
+</style>
+
+<script>
+  const level = document.getElementById('level') as HTMLElement;
+  const track = document.getElementById('track') as HTMLElement;
+  const cube = document.getElementById('cube') as HTMLElement;
+  const prog = document.getElementById('prog') as HTMLElement;
+  const spikes = Array.from(track.querySelectorAll<HTMLElement>('[data-spike]'));
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Mouse wheel scrolls the level sideways. Trackpads and touch already scroll sideways.
+  level.addEventListener(
+    'wheel',
+    (e) => {
+      if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+        e.preventDefault();
+        level.scrollLeft += e.deltaY;
+      }
+    },
+    { passive: false },
+  );
+
+  const JUMP_WIDTH = 120; // px either side of a spike where the cube is in the air
+  const JUMP_HEIGHT = 80;
+
+  function update() {
+    const max = level.scrollWidth - level.clientWidth;
+    prog.style.width = (max > 0 ? (level.scrollLeft / max) * 100 : 0) + '%';
+    if (reduce) return;
+
+    // The cube stays put on screen; find where it is along the level.
+    const cubeX = level.scrollLeft + cube.offsetLeft + cube.offsetWidth / 2;
+    let lift = 0;
+    for (const s of spikes) {
+      const d = Math.abs(cubeX - (s.offsetLeft + s.offsetWidth / 2));
+      const k = Math.max(0, 1 - (d / JUMP_WIDTH) ** 2);
+      lift = Math.max(lift, k * JUMP_HEIGHT);
+    }
+    const spin = level.scrollLeft * 0.4;
+    cube.style.transform = `translateY(${-lift}px) rotate(${spin}deg)`;
+  }
+
+  level.addEventListener('scroll', () => requestAnimationFrame(update), { passive: true });
+  window.addEventListener('resize', update);
+  update();
+</script>
